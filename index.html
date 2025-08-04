@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create a Blog – Adobe Style</title>
+  <style>
+    /* Reset and basics */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #111;
+      background-color: #fff;
+      line-height: 1.6;
+    }
+
+    /* Container styles */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 50px;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 40px;
+    }
+
+    /* Text section */
+    .text-section {
+      max-width: 500px;
+      flex: 1;
+    }
+
+    .text-section h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      color: #222;
+    }
+
+    .text-section p {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      color: #444;
+    }
+
+    /* Call to action */
+    .cta {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .cta button {
+      background-color: #635BFF;
+      color: #fff;
+      font-size: 1.125rem;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(99, 91, 255, 0.3);
+    }
+
+    .cta button:hover,
+    .cta button:focus {
+      background-color: #4a3edb;
+      outline: none;
+    }
+
+    .cta span {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* Image section */
+    .image-section img {
+      max-width: 500px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      flex: 1;
+    }
+
+    /* Section headers */
+    h1 {
+      font-weight: 900;
+      font-size: 2.5rem;
+      text-align: center;
+      margin: 60px auto 20px;
+      max-width: 900px;
+      color: #222;
+    }
+
+    p {
+      font-weight: 400;
+      font-size: 1rem;
+      max-width: 900px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+      color: #444;
+      text-align: center;
+    }
+
+    /* Template row */
+    .template-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 900px;
+      margin: 0 auto 80px;
+    }
+
+    .template-card {
+      width: 160px;
+      height: 160px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgb(0 0 0 / 0.1);
+      background: #fefefe;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .template-card:hover,
+    .template-card:focus {
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.2);
+      outline: none;
+    }
+
+    .start-scratch {
+      border: 2px dashed #ccc;
+      color: #4a4aff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      text-align: center;
+    }
+
+    .start-scratch svg {
+      width: 36px;
+      height: 36px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+
+    .template-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #333;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Design info section */
+    .design-section {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 50px;
+      max-width: 1200px;
+      margin: 0 auto 100px;
+      background-color: #fff;
+      gap: 40px;
+    }
+
+    .design-image img {
+      max-width: 550px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      flex: 1;
+    }
+
+    .design-text {
+      max-width: 600px;
+      padding: 20px;
+      flex: 1;
+    }
+
+    .design-text h2 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .design-text p {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: #444;
+    }
+
+    /* Footer */
+    footer.footer {
+      background-color: #f9f9f9;
+      padding: 40px 20px 20px;
+      font-size: 14px;
+      color: #555;
+      font-weight: 400;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+
+    .footer-column {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .footer-column h4 {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #222;
+    }
+
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-column ul li {
+      margin-bottom: 8px;
+    }
+
+    .footer-column ul li a {
+      text-decoration: none;
+      color: #555;
+      transition: color 0.3s ease;
+    }
+
+    .footer-column ul li a:hover,
+    .footer-column ul li a:focus {
+      color: #635BFF;
+      outline: none;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      flex-wrap: wrap;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .footer-bottom div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-bottom img {
+      height: 20px;
+      width: auto;
+      filter: grayscale(100%);
+      transition: filter 0.3s ease;
+    }
+
+    .footer-bottom div:hover img,
+    .footer-bottom div:focus img {
+      filter: none;
+      outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container,
+      .design-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .cta {
+        flex-direction: column;
+      }
+
+      .template-row {
+        justify-content: center;
+      }
+
+      .design-text {
+        padding-top: 30px;
+      }
+
+      .footer-columns {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+
+    .close {
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    } 
+  </style>
+</head>
+
+<body>
+
+  <!-- Section 1: Hero -->
+  <section class="container" aria-label="Hero section with blog introduction">
+    <div class="text-section">
+      <h1>Create a blog for free.</h1>
+      <p>
+        Design a personalized online blog for free with Adobe Express. Share your passions, tell your story, and establish your online presence with an array of customizable templates, themes, and powerful generative AI tools at your fingertips. It’s quick and easy to get started.
+      </p>
+      <div class="cta">
+        <button type="button" id="openModal" >Create now</button>
+      </div>
+    </div>
+    <div class="image-section">
+      <img src="image/1.webp" alt="Laptop showing blog design mockup" loading="lazy" />
+    </div>
+
+
+    <div class="modal" id="signupModal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>Sign Up</h3>
+      <form id="signupForm">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  </section>
+
+   
+
+  <!-- Section 2: Blog Templates -->
+  <section aria-label="Blog templates selection">
+    <h1>Create a beautiful blog that resonates with your audience.</h1>
+    <p>
+      Everyone has a story to tell or something to share. With fully customizable blog templates at your side, you have the freedom to create a blog tailored to your needs and visual aesthetics. Pick one to get started, then easily populate your online blog with as many blog entries as you’d like. Add photos and videos to personalize each blog post and add text to give readers further context. Rearrange each section of text and imagery exactly how you like to make a visually engaging blog that’ll inspire your readers to read on.
+    </p>
+
+    <div class="template-row" role="list">
+      <!-- Start from scratch card -->
+      <div class="template-card start-scratch" role="listitem" tabindex="0" title="Start from scratch">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 4v16M4 12h16" />
+        </svg>
+        <div>Start from<br>scratch</div>
+      </div>
+
+      <!-- Template cards -->
+      <div class="template-card" role="listitem" tabindex="0" title="Blog Template 1">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+          alt="Preview of Blog Template 1" class="template-image" loading="lazy" />
+       
+      </div>
+
+      <div class="template-card" role="listitem" tabindex="0" title="Blog Template 2">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80"
+          alt="Preview of Blog Template 2" class="template-image" loading="lazy" />
+        
+      </div>
+
+      <div class="template-card" role="listitem" tabindex="0" title="Blog Template 3">
+        <img src="https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?auto=format&fit=crop&w=400&q=80"
+          alt="Preview of Blog Template 3" class="template-image" loading="lazy" />
+       
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Design Info -->
+  <section class="design-section" aria-label="Blog design information">
+    <div class="design-image">
+      <img src="image/2.webp" alt="Adobe Express blog design themes preview" loading="lazy" />
+    </div>
+    <div class="design-text">
+      <h2>Easy blog design starts with Adobe Express.</h2>
+      <p>
+        Experience the freedom to create a professional blog exactly as you imagine, without any design skills required. Customize your visual theme by choosing your favorite fonts, colors, and more to apply consistently across all your one-page blogs made in Adobe Express. Or choose from the one-click theme options readily available.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h4>For individuals &amp; small business</h4>
+        <ul>
+          <li><a href="#">Creative AI</a></li>
+          <li><a href="#">Photography</a></li>
+          <li><a href="#">Design and illustration</a></li>
+          <li><a href="#">Video and animation</a></li>
+          <li><a href="#">PDF</a></li>
+          <li><a href="#">3D</a></li>
+          <li><a href="#">Elements Family</a></li>
+          <li><a href="#">Stock images and video</a></li>
+          <li><a href="#">View all products</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>For medium &amp; large business</h4>
+        <ul>
+          <li><a href="#">Personalization at scale</a></li>
+          <li><a href="#">Content supply chain</a></li>
+          <li><a href="#">Unified customer experience</a></li>
+          <li><a href="#">Creativity and production</a></li>
+          <li><a href="#">B2B GTM orchestration</a></li>
+          <li><a href="#">View all products</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Download and install</a></li>
+          <li><a href="#">Adobe Community</a></li>
+          <li><a href="#">Adobe Learn</a></li>
+          <li><a href="#">Medium and large business support</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#">Chat with sales</a></li>
+          <li><a href="#">Request information</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Adobe</h4>
+        <ul>
+          <li><a href="#">Log into your account</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Newsroom</a></li>
+          <li><a href="#">Corporate responsibility</a></li>
+          <li><a href="#">Investor Relations</a></li>
+          <li><a href="#">Supply chain</a></li>
+          <li><a href="#">Trust Center</a></li>
+          <li><a href="#">Adobe for All</a></li>
+          <li><a href="#">Adobe Blog</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+     <script>
+    const modal = document.getElementById("signupModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.getElementById("closeModal");
+    const form = document.getElementById("signupForm");
+
+    openBtn.onclick = () => modal.style.display = "flex";
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      // Normally you might save the data here...
+      // Redirect to show.html
+      window.location.href = "show1.html";
+    };
+
+      function createBlog() {
+      const blogName = document.getElementById("blogName").value.trim();
+      if (!blogName) {
+        alert("Please enter a blog name.");
+        return;
+      }
+      window.location.href = `show1.html?blogName=${encodeURIComponent(blogName)}`;
+    }
+  </script>
+
+</body>
+</html>
+
+      

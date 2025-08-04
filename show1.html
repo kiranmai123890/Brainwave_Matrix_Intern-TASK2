@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slide Editor - Sidebar Push Layout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+  :root {
+      --bg: #f9f9f9;
+      --text: #111;
+      --card-bg: #ffffff;
+      --button: #000;
+      --button-text: #fff;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      --slide-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #ffffff;
+      --card-bg: #1e1e1e;
+      --button: #fff;
+      --button-text: #000;
+      --shadow: 0 6px 18px rgba(255, 255, 255, 0.08);
+      --slide-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s ease;
+    }
+
+    .top-navbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--text);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .top-navbar button {
+      background: var(--button);
+      color: var(--button-text);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .top-navbar button:hover {
+      opacity: 0.9;
+    }
+
+    .hamburger {
+      position: absolute;
+      left: 10px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 64px;
+      left: -260px;
+      width: 260px;
+      height: calc(100% - 64px);
+      background: var(--card-bg);
+      color: var(--text);
+      padding: 20px;
+      border-right: 1px solid var(--text);
+      transition: left 0.3s ease;
+      z-index: 999;
+      box-shadow: var(--shadow);
+    }
+
+    #sidebar.active {
+      left: 0;
+    }
+
+    #main {
+      display: flex;
+      transition: margin-left 0.3s ease;
+    }
+
+    #main.shifted {
+      margin-left: 260px;
+    }
+
+    #editor {
+      flex-grow: 1;
+      padding: 30px 20px;
+    }
+
+    .slide {
+      width: 640px;
+      height: 400px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--text);
+      box-shadow: var(--slide-shadow);
+      border-radius: 12px;
+      margin: 40px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .draggable {
+      position: absolute;
+      cursor: move;
+      padding: 5px;
+      color: var(--text);
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: crimson;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 0 0 0 6px;
+    }
+
+    .selected {
+      outline: 3px dashed var(--text);
+    }
+
+    #sidebar label {
+      margin-top: 10px;
+      font-weight: 500;
+      display: block;
+    }
+
+    #sidebar input,
+    #sidebar select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--text);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .post-card {
+      max-width: 700px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      color: var(--text);
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    #commentBox input,
+    #commentBox textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      background: transparent;
+      color: var(--text);
+    }
+
+    #commentBox button {
+      padding: 10px 18px;
+      background: var(--button);
+      color: var(--button-text);
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .comment-display {
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+    }
+
+    .single-comment {
+      display: flex;
+      gap: 10px;
+      background: #f1f1f1;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      background: #000;
+    }
+
+    .dark .single-comment {
+      background: #333;
+    }
+
+    .dark #commentBox input,
+    .dark #commentBox textarea {
+      background: #333;
+      color: white;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      margin: 25px 0;
+    }
+   </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>🎨 Design Tools</h3>
+    <label>Background Color</label><input type="color" id="bgColor" />
+    <label>Background Image</label><input type="file" id="bgImage" accept="image/*" />
+    <label>Font Family</label>
+    <select id="fontFamily">
+      <option>Arial</option><option>Georgia</option><option>Courier New</option>
+      <option>Verdana</option><option>Times New Roman</option>
+    </select>
+    <label>Font Size</label><input type="number" id="fontSize" min="10" max="100" value="24" />
+    <label>Font Color</label><input type="color" id="fontColor" />
+    <label>Opacity</label><input type="range" id="opacitySlider" min="0.1" max="1" step="0.1" value="1" />
+  </div>
+
+  <div class="top-navbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <button onclick="addText()">➕ Text</button>
+    <button onclick="addImage()">🖼️ Image</button>
+    <button onclick="addNewSlide()">➕ Slide</button>
+    <button onclick="downloadImage()">⬇️ PNG</button>
+    <button onclick="downloadPDF()">📄 PDF</button>
+    <button onclick="postSlides()">📤 Post</button>
+    <button onclick="toggleDarkMode()">🌓</button>
+  </div>
+
+  <div id="main">
+    <div id="editor">
+      <div id="slides-container" onclick="selectElement(event)"></div>
+    </div>
+  </div>
+
+  <script>
+    let slides = [""];
+    let currentSlideIndex = 0;
+    let selected = null;
+    const slidesContainer = document.getElementById("slides-container");
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('main');
+      sidebar.classList.toggle('active');
+      main.classList.toggle('shifted');
+    }
+
+    function addNewSlide() {
+      saveCurrentSlide();
+      slides.push("");
+      currentSlideIndex = slides.length - 1;
+      renderAllSlides();
+      scrollToSlide(currentSlideIndex);
+    }
+
+    function renderAllSlides() {
+      slidesContainer.innerHTML = '';
+      slides.forEach((content, idx) => {
+        const slide = document.createElement("div");
+        slide.className = "slide";
+        slide.innerHTML = content;
+        if (idx === currentSlideIndex) slide.classList.add("selected");
+        [...slide.querySelectorAll(".draggable")].forEach(el => makeDraggable(el));
+        slidesContainer.appendChild(slide);
+      });
+    }
+
+    function scrollToSlide(index) {
+      const allSlides = slidesContainer.querySelectorAll(".slide");
+      if (allSlides[index]) {
+        allSlides[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function saveCurrentSlide() {
+      if (slidesContainer.children[currentSlideIndex])
+        slides[currentSlideIndex] = slidesContainer.children[currentSlideIndex].innerHTML;
+    }
+
+    function addText() {
+      const slide = slidesContainer.children[currentSlideIndex];
+      if (!slide) return;
+      const textBox = document.createElement("div");
+      textBox.className = "draggable";
+      textBox.innerText = "Edit Me";
+      Object.assign(textBox.style, {
+        top: "50px", left: "50px", fontSize: "24px", fontFamily: "Arial",
+        color: "#000", opacity: 1
+      });
+      textBox.contentEditable = true;
+      const delBtn = document.createElement("button");
+      delBtn.innerText = "×";
+      delBtn.className = "delete-btn";
+      delBtn.onclick = e => { e.stopPropagation(); textBox.remove(); };
+      textBox.appendChild(delBtn);
+      textBox.onclick = e => { e.stopPropagation(); selected = textBox; };
+      makeDraggable(textBox);
+      slide.appendChild(textBox);
+    }
+
+    function addImage() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = function () {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "contain";
+          const container = document.createElement("div");
+          container.className = "draggable";
+          Object.assign(container.style, {
+            top: "80px", left: "80px", width: "150px", height: "150px"
+          });
+          const delBtn = document.createElement("button");
+          delBtn.innerText = "×";
+          delBtn.className = "delete-btn";
+          delBtn.onclick = () => container.remove();
+          container.appendChild(img);
+          container.appendChild(delBtn);
+          makeDraggable(container);
+          const slide = slidesContainer.children[currentSlideIndex];
+          slide.appendChild(container);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    function makeDraggable(el) {
+      el.onmousedown = function (e) {
+        if (e.target.classList.contains("delete-btn")) return;
+        let offsetX = e.clientX - el.offsetLeft;
+        let offsetY = e.clientY - el.offsetTop;
+        function move(e) {
+          el.style.left = `${e.clientX - offsetX}px`;
+          el.style.top = `${e.clientY - offsetY}px`;
+        }
+        function stop() {
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", stop);
+        }
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", stop);
+      };
+    }
+
+    function selectElement(e) {
+      if (!e.target.closest(".draggable")) selected = null;
+    }
+
+    function postSlides() {
+  saveCurrentSlide();
+
+  // Clear the entire page
+  document.body.innerHTML = '';
+
+  // 🆕 Create and insert "📌 The Posted" heading
+  const heading = document.createElement("h2");
+  heading.textContent = "📌 The Posted";
+  heading.style.textAlign = "center";
+  heading.style.fontSize = "28px";
+  heading.style.margin = "20px 0";
+  heading.style.fontWeight = "bold";
+  heading.style.color = "#333"; // Adjust for theme
+  document.body.appendChild(heading); // 🆕 Add heading before post card
+
+  // Create post card
+  const postCard = document.createElement("div");
+  postCard.className = "post-card";
+
+  slides.forEach(html => {
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.innerHTML = html;
+    postCard.appendChild(slide);
+  });
+
+  // Add comment box
+  const commentBox = document.createElement("div");
+  commentBox.id = "commentBox";
+  commentBox.innerHTML = `
+    <input type="text" id="commentName" placeholder="Your name" />
+    <textarea id="commentText" placeholder="Your comment..."></textarea>
+    <button onclick="submitComment()">Submit</button>
+    <div id="commentList" class="comment-display"></div>
+  `;
+  postCard.appendChild(commentBox);
+
+  // Append postCard after heading
+  document.body.appendChild(postCard);
+
+  loadComments();
+}
+
+
+    function submitComment() {
+      const name = document.getElementById("commentName").value.trim();
+      const text = document.getElementById("commentText").value.trim();
+      if (!name || !text) return alert("Please fill both fields");
+      const timestamp = new Date().toLocaleString();
+      const comment = { name, text, timestamp };
+      const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+      comments.push(comment);
+      localStorage.setItem("comments", JSON.stringify(comments));
+      appendComment(comment);
+      document.getElementById("commentName").value = "";
+      document.getElementById("commentText").value = "";
+    }
+
+    function appendComment({ name, text, timestamp }) {
+      const list = document.getElementById("commentList");
+      const avatarColor = "#" + intToRGB(hashCode(name));
+      const initials = name.split(" ").map(s => s[0]).join("").toUpperCase().slice(0, 2);
+      const div = document.createElement("div");
+      div.className = "single-comment";
+      div.innerHTML = `
+        <div class="avatar" style="background:${avatarColor}">${initials}</div>
+        <div><strong>${name}</strong><br><small>${timestamp}</small><p>${text}</p></div>
+      `;
+      list.appendChild(div);
+    }
+
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+      comments.forEach(c => appendComment(c));
+    }
+
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+    }
+
+    function intToRGB(i) {
+      const c = (i & 0x00FFFFFF).toString(16).toUpperCase();
+      return "00000".substring(0, 6 - c.length) + c;
+    }
+
+    function downloadImage() {
+      const slide = slidesContainer.children[currentSlideIndex];
+      html2canvas(slide, { scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `slide${currentSlideIndex + 1}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    function downloadPDF() {
+      saveCurrentSlide();
+      const pdf = new jspdf.jsPDF({ unit: "px", format: "a4" });
+      const width = pdf.internal.pageSize.getWidth();
+      (async () => {
+        for (let i = 0; i < slides.length; i++) {
+          const temp = document.createElement("div");
+          temp.className = "slide";
+          temp.innerHTML = slides[i];
+          document.body.appendChild(temp);
+          await new Promise(res => setTimeout(res, 200));
+          const canvas = await html2canvas(temp, { scale: 2 });
+          const img = canvas.toDataURL("image/png");
+          const ratio = width / canvas.width;
+          const height = canvas.height * ratio;
+          if (i > 0) pdf.addPage();
+          pdf.addImage(img, "PNG", 0, 0, width, height);
+          temp.remove();
+        }
+        pdf.save("slides.pdf");
+      })();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    window.onload = () => {
+      renderAllSlides();
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+    };
+
+    document.getElementById("bgColor").oninput = () => {
+      const slide = slidesContainer.children[currentSlideIndex];
+      if (slide) slide.style.backgroundColor = document.getElementById("bgColor").value;
+    };
+
+    document.getElementById("bgImage").onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const slide = slidesContainer.children[currentSlideIndex];
+        if (slide) slide.style.backgroundImage = `url(${ev.target.result})`;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    document.getElementById("fontFamily").onchange = () => {
+      if (selected) selected.style.fontFamily = document.getElementById("fontFamily").value;
+    };
+    document.getElementById("fontSize").oninput = () => {
+      if (selected) selected.style.fontSize = document.getElementById("fontSize").value + "px";
+    };
+    document.getElementById("fontColor").oninput = () => {
+      if (selected) selected.style.color = document.getElementById("fontColor").value;
+    };
+    document.getElementById("opacitySlider").oninput = () => {
+      if (selected) selected.style.opacity = document.getElementById("opacitySlider").value;
+    };
+  </script>
+</body>
+</html>
